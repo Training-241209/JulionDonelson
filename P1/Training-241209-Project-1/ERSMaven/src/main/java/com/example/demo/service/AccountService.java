@@ -70,4 +70,9 @@ public class AccountService
 	{
 		return !accountRepository.customFindById(id).isEmpty();
 	}
+	
+	public Account findAccount(String username)
+	{
+		return accountRepository.findByUsername(username).get();
+	}
 }

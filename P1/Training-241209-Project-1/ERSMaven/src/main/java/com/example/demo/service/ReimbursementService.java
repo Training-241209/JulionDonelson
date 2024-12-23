@@ -20,7 +20,9 @@ public class ReimbursementService
 	
 	public Reimbursement createTicket(Reimbursement reimbursement)
 	{
-		return reimbursementRepository.save(reimbursement);
+		Reimbursement newReimbursement = reimbursement;
+		newReimbursement.setStatus("Pending");
+		return reimbursementRepository.save(newReimbursement);
 	}
 	
 	public Reimbursement approveTicket(Reimbursement reimbursement)

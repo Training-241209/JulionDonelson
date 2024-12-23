@@ -78,4 +78,9 @@ public class Reimbursement
 	{
 		return account;
 	}
+	
+	public void setAccount(Account account)
+	{
+		this.account = account;
+	}
 }

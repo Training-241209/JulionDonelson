@@ -10,6 +10,8 @@ import com.example.demo.service.AccountService;
 import com.example.demo.entity.Reimbursement;
 import com.example.demo.service.ReimbursementService;
 import com.example.demo.service.JwtService;
+import com.example.demo.dto.response.AccountResponse;
+import com.example.demo.dto.response.ReimbursementResponse;
 
 import java.util.List;
 
@@ -46,7 +48,7 @@ public class ERSController
 	}*/
 	
 	@PostMapping("/register")
-	public ResponseEntity<Account> registerAccount(@RequestBody Account account)
+	public ResponseEntity<AccountResponse> registerAccount(@RequestBody Account account)
 	{
 		if (accountService.accountCheck(account.getUsername()))
 		{
@@ -59,7 +61,8 @@ public class ERSController
 		else
 		{
 			Account newAccount = accountService.registerAccount(account);
-			return new ResponseEntity<>(newAccount, HttpStatus.OK);
+			AccountResponse response = new AccountResponse(newAccount);
+			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}
 	
@@ -80,31 +83,49 @@ public class ERSController
 	}
 	
 	@PostMapping("/reimbursement")
-	public ResponseEntity<Reimbursement> createTicket(@RequestBody Reimbursement reimbursement)
+	public ResponseEntity<Reimbursement> createTicket(@RequestHeader(name = "Authorization") String token, @RequestBody Reimbursement reimbursement)
 	{
+		// System.out.println("The Authorization is: " + token);
+		Account account = accountService.findAccount(jwtService.decodeToken(token).getUsername());
+		/* System.out.println("The role of the account is: " + account.getRole().getTitle());
+		
+		if (account.getRole().getTitle().equals("User"))
+		{
+			System.out.println("Reimbursement created by User.");
+		}
+		if (account.getRole().getTitle().equals("Manager"))
+		{
+			System.out.println("Reimbursement created by Manager.");
+		} */
+		
+		reimbursement.setAccount(account);
+		
 		Reimbursement newReimbursement = reimbursementService.createTicket(reimbursement);
 		return new ResponseEntity<>(newReimbursement, HttpStatus.OK);
 	}
 	
 	@PatchMapping("/reimbursement/approve")
-	public ResponseEntity<Reimbursement> approveTicket(@RequestBody Reimbursement reimbursement)
+	public ResponseEntity<ReimbursementResponse> approveTicket(@RequestHeader(name = "Authorization") String token, @RequestBody Reimbursement reimbursement)
 	{
-		/*if (reimbursement.getAccount() == null || reimbursement.getAccount().getRole().getTitle() != "Manager")
+		Account account = accountService.findAccount(jwtService.decodeToken(token).getUsername());
+		if (!account.getRole().getTitle().equals("Manager"))
 		{
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 		else
-		{*/
+		{
 			Reimbursement approved = reimbursementService.approveTicket(reimbursement);
 			
 			if (approved != null)
 			{
-				return new ResponseEntity<>(approved, HttpStatus.OK);
+				ReimbursementResponse response = new ReimbursementResponse(approved.getReimbursementId(), approved.getDescription(), approved.getAmount(), approved.getStatus());
+				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
 			else
 			{
-				return new ResponseEntity<>(approved, HttpStatus.valueOf(400));
+				ReimbursementResponse response = null;
+				return new ResponseEntity<>(response, HttpStatus.valueOf(400));
 			}
-		//}
+		}
 	}
 }

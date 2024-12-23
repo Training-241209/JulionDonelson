@@ -17,6 +17,14 @@ public class ReimbursementResponse
 		
 	}
 	
+	public ReimbursementResponse(Long id, String des, int amount, String status)
+	{
+		this.reimbursementId = id;
+		this.description = des;
+		this.amount = amount;
+		this.status = status;
+	}
+	
 	public ReimbursementResponse (Reimbursement reimbursement)
 	{
 		this.reimbursementId = reimbursement.getReimbursementId();
