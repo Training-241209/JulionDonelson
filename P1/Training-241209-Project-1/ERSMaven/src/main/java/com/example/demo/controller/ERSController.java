@@ -108,6 +108,7 @@ public class ERSController
 	public ResponseEntity<ReimbursementResponse> approveTicket(@RequestHeader(name = "Authorization") String token, @RequestBody Reimbursement reimbursement)
 	{
 		Account account = accountService.findAccount(jwtService.decodeToken(token).getUsername());
+		
 		if (!account.getRole().getTitle().equals("Manager"))
 		{
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
